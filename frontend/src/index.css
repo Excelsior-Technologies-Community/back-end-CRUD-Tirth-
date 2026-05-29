@@ -1,0 +1,301 @@
+:root {
+  --bg-color: #09090b;
+  --panel-bg: #18181b;
+  --panel-border: #27272a;
+  --text-primary: #f4f4f5;
+  --text-secondary: #a1a1aa;
+  --input-bg: #18181b;
+  --input-border: #27272a;
+  --accent-color: #6366f1;
+  --success-color: #10b981;
+  --danger-color: #ef4444;
+  --font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
+  margin: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+}
+
+/* Flat Panel style (replaces glass-panel with simple clean border) */
+.glass-panel {
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: border-color 0.2s ease;
+}
+
+.glass-panel:hover {
+  border-color: #3f3f46;
+}
+
+/* Simple text colors (replaces glowing text gradients) */
+.text-gradient {
+  color: var(--accent-color) !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+.text-gradient-cyan {
+  color: #06b6d4 !important;
+  background: none !important;
+  -webkit-background-clip: initial !important;
+  -webkit-text-fill-color: initial !important;
+}
+
+/* Custom Input Field */
+.custom-input {
+  background: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 8px !important;
+  padding: 10px 14px !important;
+  transition: all 0.2s ease !important;
+}
+
+.custom-input:focus {
+  background: var(--input-bg) !important;
+  border-color: var(--accent-color) !important;
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2) !important;
+  color: var(--text-primary) !important;
+}
+
+.custom-input::placeholder {
+  color: #71717a !important;
+}
+
+select.custom-input option {
+  background-color: #18181b;
+  color: var(--text-primary);
+}
+
+/* Simple flat buttons */
+.btn-glow-primary {
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  font-weight: 500;
+  border-radius: 8px;
+  padding: 10px 20px;
+  transition: all 0.2s ease;
+}
+
+.btn-glow-primary:hover {
+  background: #4f46e5;
+  color: white;
+}
+
+.btn-glow-primary:active {
+  transform: translateY(0);
+}
+
+.btn-action {
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.btn-action-edit {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.btn-action-edit:hover {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-action-delete {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.btn-action-delete:hover {
+  background-color: #ef4444;
+  color: white;
+}
+
+/* Category Badge colors */
+.badge-category {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 4px;
+}
+
+.badge-electronics {
+  background-color: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.badge-clothing {
+  background-color: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+.badge-home {
+  background-color: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.badge-books {
+  background-color: rgba(245, 158, 11, 0.1);
+  color: #f59e0b;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.badge-other {
+  background-color: rgba(113, 113, 122, 0.1);
+  color: #a1a1aa;
+  border: 1px solid rgba(113, 113, 122, 0.2);
+}
+
+/* Custom Table Styles */
+.custom-table {
+  color: var(--text-primary) !important;
+  background-color: transparent !important;
+}
+
+.custom-table :not(caption) > * > * {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.custom-table th {
+  border-top: none;
+  border-bottom: 1px solid var(--panel-border) !important;
+  color: var(--text-secondary) !important;
+  font-weight: 500;
+  font-size: 0.8rem;
+  padding: 12px 16px !important;
+}
+
+.custom-table td {
+  padding: 12px 16px !important;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--panel-border) !important;
+}
+
+.custom-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.custom-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.02) !important;
+}
+
+/* Dashboard Metric Cards */
+.metric-card {
+  padding: 20px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.metric-card:hover {
+  border-color: #3f3f46;
+}
+
+.metric-icon-container {
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.metric-icon-indigo {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: #6366f1;
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.metric-icon-cyan {
+  background-color: rgba(6, 182, 212, 0.1);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+}
+
+.metric-icon-violet {
+  background-color: rgba(168, 85, 247, 0.1);
+  color: #a855f7;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+}
+
+/* Modal Custom Styles */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1050;
+}
+
+.custom-modal-content {
+  width: 450px;
+  max-width: 90%;
+  border-radius: 12px;
+  padding: 24px;
+  background: #18181b !important;
+  border: 1px solid var(--panel-border) !important;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.modal-backdrop-blur {
+  filter: none;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-color);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #3f3f46;
+}
+
