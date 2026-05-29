@@ -455,15 +455,20 @@ function App() {
               <table className="table custom-table mb-0 align-middle">
                 <thead>
                   <tr>
-                    <th scope="col" style={{ width: '40%' }}>Product Info</th>
-                    <th scope="col" style={{ width: '25%' }}>Category</th>
+                    <th scope="col" style={{ width: '10%' }}>#</th>
+                    <th scope="col" style={{ width: '35%' }}>Product Info</th>
+                    <th scope="col" style={{ width: '20%' }}>Category</th>
                     <th scope="col" style={{ width: '20%' }}>Price</th>
                     <th scope="col" style={{ width: '15%' }} className="text-end">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredProducts.map((product) => (
+                  {filteredProducts.map((product, index) => (
                     <tr key={product._id} className="animate-fade-in">
+                      {/* Serial number column */}
+                      <td>
+                        <span className="text-secondary fw-semibold">{index + 1}</span>
+                      </td>
                       {/* Name & ID column */}
                       <td>
                         <div className="fw-bold text-white fs-5">{product.name}</div>

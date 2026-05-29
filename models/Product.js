@@ -18,7 +18,8 @@ const productSchema = new mongoose.Schema({
         trim: true
     }
 }, {
-    collection: 'products'
+    collection: 'products',
+    timestamps: true
 });
 
 // Create and export the Product model

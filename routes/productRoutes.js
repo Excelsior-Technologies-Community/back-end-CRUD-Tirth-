@@ -48,8 +48,8 @@ router.post('/', async (req, res) => {
 // @access  Public
 router.get('/', async (req, res) => {
     try {
-        // Find all products
-        const products = await Product.find();
+        // Find all products sorted by createdAt descending
+        const products = await Product.find().sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,
