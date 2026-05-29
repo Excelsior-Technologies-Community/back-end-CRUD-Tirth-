@@ -17,7 +17,7 @@ const connectDB = async () => {
 
         // Attempt to connect to MongoDB using mongoose, specifying database name as stocksync
         await mongoose.connect(uri, { dbName: 'stocksync' });
-        
+
         // Log a success message to the console once the connection is established
         console.log('MongoDB Connected');
     } catch (error) {
