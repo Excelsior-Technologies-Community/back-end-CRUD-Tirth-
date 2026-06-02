@@ -130,7 +130,10 @@ const deleteProduct = async (req, res) => {
 
         // Optionally remove uploaded image file if it was uploaded by user
         const imageFilename = deletedProduct.image;
-        const defaultImages = ['car.png', 'bottle.jpg', 'laptop.jpg', 'wireless_gaming_mouse.jpg', 'gaming_mouse.jpg'];
+        const defaultImages = [
+            'car.png', 'bottle.jpg', 'laptop.jpg', 'wireless_gaming_mouse.jpg', 'gaming_mouse.jpg',
+            'smartwatch.jpg', 'headphones.jpg', 'shoes.jpg', 'backpack.jpg', 'camera.jpg'
+        ];
         if (imageFilename && !defaultImages.includes(imageFilename)) {
             const filePath = path.join(__dirname, '../uploads', imageFilename);
             if (fs.existsSync(filePath)) {
