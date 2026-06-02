@@ -75,7 +75,8 @@ function Dashboard() {
   const [formData, setFormData] = useState({
     name: '',
     price: '',
-    category: ''
+    category: '',
+    image: ''
   });
 
   // Modal control states
@@ -200,7 +201,7 @@ function Dashboard() {
   };
 
   const openAddModal = () => {
-    setFormData({ name: '', price: '', category: '' });
+    setFormData({ name: '', price: '', category: '', image: '' });
     setEditId(null);
     setIsAddModalOpen(true);
   };
@@ -209,7 +210,8 @@ function Dashboard() {
     setFormData({
       name: product.name,
       price: product.price,
-      category: product.category
+      category: product.category,
+      image: product.image || ''
     });
     setEditId(product._id);
     setIsEditModalOpen(true);

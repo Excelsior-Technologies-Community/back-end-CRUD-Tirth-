@@ -111,27 +111,38 @@ function ProductTable({
           <table className="table custom-table mb-0 align-middle">
             <thead>
               <tr>
-                <th scope="col" style={{ width: '10%' }}>#</th>
-                <th scope="col" style={{ width: '35%' }}>Product Info</th>
+                <th scope="col" style={{ width: '15%' }}>Image</th>
+                <th scope="col" style={{ width: '30%' }}>Product Info</th>
                 <th scope="col" style={{ width: '20%' }}>Category</th>
                 <th scope="col" style={{ width: '20%' }}>Price</th>
                 <th scope="col" style={{ width: '15%' }} className="text-end">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product, index) => (
-                <tr key={product._id} className="animate-fade-in">
-                  {/* Dynamic Serial Index Column */}
-                  <td>
-                    <span className="text-secondary fw-semibold">{index + 1}</span>
-                  </td>
-                  {/* Name and Database ID Column */}
-                  <td>
-                    <div className="fw-bold text-white fs-5">{product.name}</div>
-                    <small className="text-muted" style={{ fontSize: '0.75rem' }}>
-                      ID: {product._id}
-                    </small>
-                  </td>
+              {filteredProducts.map((product, index) => {
+                const placeholderSvg = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' style='background:%2327272a;width:100%25;height:100%25;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path><polyline points='3.27 6.96 12 12.01 20.73 6.96'></polyline><line x1='12' y1='22.08' x2='12' y2='12'></line></svg>";
+                return (
+                  <tr key={product._id} className="animate-fade-in">
+                    {/* Thumbnail Image Column */}
+                    <td>
+                      <div className="d-flex align-items-center justify-content-center border rounded bg-dark" style={{ width: '48px', height: '48px', overflow: 'hidden', borderColor: 'var(--panel-border)' }}>
+                        <img
+                          src={product.image || placeholderSvg}
+                          alt={product.name}
+                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          onError={(e) => {
+                            e.target.src = placeholderSvg;
+                          }}
+                        />
+                      </div>
+                    </td>
+                    {/* Name and Database ID Column */}
+                    <td>
+                      <div className="fw-bold text-white fs-5">{product.name}</div>
+                      <small className="text-muted" style={{ fontSize: '0.75rem' }}>
+                        ID: {product._id}
+                      </small>
+                    </td>
                   {/* Category Type Column */}
                   <td>
                     <span className={`badge badge-category ${getCategoryBadgeClass(product.category)}`}>
@@ -166,7 +177,7 @@ function ProductTable({
                     </div>
                   </td>
                 </tr>
-              ))}
+              ); })}
             </tbody>
           </table>
         </div>

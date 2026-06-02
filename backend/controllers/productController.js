@@ -7,7 +7,7 @@ const Product = require('../models/Product');
  */
 const createProduct = async (req, res) => {
     try {
-        const { name, price, category } = req.body;
+        const { name, price, category, image } = req.body;
 
         // Simple validation check
         if (!name || price === undefined || !category) {
@@ -22,7 +22,8 @@ const createProduct = async (req, res) => {
         const newProduct = new Product({
             name,
             price,
-            category
+            category,
+            image
         });
 
         const savedProduct = await newProduct.save();
@@ -75,12 +76,12 @@ const getProducts = async (req, res) => {
  */
 const updateProduct = async (req, res) => {
     try {
-        const { name, price, category } = req.body;
+        const { name, price, category, image } = req.body;
 
         // Find the product by ID and update it
         const updatedProduct = await Product.findByIdAndUpdate(
             req.params.id,
-            { name, price, category },
+            { name, price, category, image },
             { returnDocument: 'after', runValidators: true }
         );
 
