@@ -1,5 +1,23 @@
 import React from 'react';
 
+// Helper function to get default category-based fallback images
+const getCategoryFallbackImage = (category) => {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('elect')) {
+    return 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=150&q=80';
+  }
+  if (cat.includes('cloth')) {
+    return 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=150&q=80';
+  }
+  if (cat.includes('home')) {
+    return 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=150&q=80';
+  }
+  if (cat.includes('book')) {
+    return 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=150&q=80';
+  }
+  return 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=150&q=80';
+};
+
 /**
  * Reusable Product Input Form Fields
  * Used in both Add and Edit modals to prevent code duplication.
@@ -79,7 +97,7 @@ function ProductForm({ formData, onChange, categories }) {
               alt="Preview"
               style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
               onError={(e) => {
-                e.target.src = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round' style='background:%2327272a;width:100%25;height:100%25;'><path d='M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z'></path><polyline points='3.27 6.96 12 12.01 20.73 6.96'></polyline><line x1='12' y1='22.08' x2='12' y2='12'></line></svg>";
+                e.target.src = getCategoryFallbackImage(formData.category);
               }}
             />
           </div>
