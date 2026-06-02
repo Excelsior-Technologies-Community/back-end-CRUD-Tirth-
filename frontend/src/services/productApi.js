@@ -46,3 +46,26 @@ export const deleteProduct = async (id) => {
   });
   return await response.json();
 };
+
+/**
+ * Fetch all available image filenames from the backend uploads directory
+ */
+export const getImages = async () => {
+  const response = await fetch('http://localhost:5000/api/images');
+  return await response.json();
+};
+
+/**
+ * Upload a new image file to the backend
+ * @param {File} file - The file object from input type="file"
+ */
+export const uploadImage = async (file) => {
+  const formData = new FormData();
+  formData.append('image', file);
+  
+  const response = await fetch('http://localhost:5000/api/upload', {
+    method: 'POST',
+    body: formData
+  });
+  return await response.json();
+};

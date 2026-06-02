@@ -7,6 +7,13 @@ const dotenv = require('dotenv');
 // Import the cors library to allow cross-origin resource sharing
 const cors = require('cors');
 
+// Import path and fs modules for folder paths and disk file systems
+const path = require('path');
+const fs = require('fs');
+
+// Import multer to handle incoming file uploads
+const multer = require('multer');
+
 // Import the database connection helper function we created in config/db.js
 const connectDB = require('./config/db');
 
@@ -31,6 +38,64 @@ app.use(cors());
 
 // Parse incoming requests with JSON payloads (so we can read req.body)
 app.use(express.json());
+
+// Serve uploaded images statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Configure multer storage for image uploads
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, path.join(__dirname, 'uploads'));
+    },
+    filename: (req, file, cb) => {
+        // Generate a unique filename using timestamp and original extension
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        const ext = path.extname(file.originalname);
+        cb(null, file.fieldname + '-' + uniqueSuffix + ext);
+    }
+});
+
+const upload = multer({ storage: storage });
+
+// POST /api/upload - Upload a new image
+app.post('/api/upload', upload.single('image'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({
+            success: false,
+            message: 'No file uploaded'
+        });
+    }
+    res.json({
+        success: true,
+        message: 'File uploaded successfully',
+        filename: req.file.filename
+    });
+});
+
+// GET /api/images - Retrieve all image filenames from uploads folder
+app.get('/api/images', (req, res) => {
+    const uploadsDir = path.join(__dirname, 'uploads');
+    
+    fs.readdir(uploadsDir, (err, files) => {
+        if (err) {
+            console.error('Error reading uploads folder:', err);
+            return res.status(500).json({
+                success: false,
+                message: 'Unable to read uploads folder',
+                error: err.message
+            });
+        }
+        
+        // Return only image files
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg'];
+        const imageFiles = files.filter(file => {
+            const ext = path.extname(file).toLowerCase();
+            return imageExtensions.includes(ext);
+        });
+        
+        res.json(imageFiles);
+    });
+});
 
 // Mounting our Product API routes under /api/products
 app.use('/api/products', productRoutes);

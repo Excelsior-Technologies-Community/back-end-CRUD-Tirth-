@@ -1,18 +1,34 @@
-import React from 'react';
-
 // Helper function to get default category-based fallback images
-const getCategoryFallbackImage = (category) => {
-  const cat = (category || '').toLowerCase();
-  if (cat.includes('elect')) {
+const getUserImageFallback = (name, category) => {
+  const nameLower = (name || '').toLowerCase();
+  const catLower = (category || '').toLowerCase();
+  
+  if (nameLower.includes('wireless gaming mouse')) {
+    return 'https://pbs.twimg.com/media/GAtXv_Ja8AAi49x.jpg';
+  }
+  if (nameLower.includes('gaming mouse') || nameLower.includes('mouse')) {
+    return 'https://www.3ona51.com/images/products/gaming-mouses/razer-basilisk-v3-35k-black-rz01-05230100-r3m1/600.jpg';
+  }
+  if (nameLower.includes('car')) {
+    return 'https://weeklysamirror.news/wp-content/uploads/2025/05/MOTORINGFerrari-12Cilindr.png';
+  }
+  if (nameLower.includes('bottle')) {
+    return 'https://media.intersport.fr/is/image/intersportfr/JX0015_11I_FA?$produit_m$&$product_grey$';
+  }
+  if (nameLower.includes('laptop') || nameLower.includes('keyboard')) {
+    return 'https://media-assets.hyperinvento.com/companies/c31a99fe-fc32-4275-a453-18c2131fef39/products/97839e51-9a1c-4746-8489-1712c04808b5/featureds/images/3c703838574946dd8073ea67f3f7c474-product-featured-lg.jpg';
+  }
+  
+  if (catLower.includes('elect')) {
     return 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=150&q=80';
   }
-  if (cat.includes('cloth')) {
+  if (catLower.includes('cloth')) {
     return 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=150&q=80';
   }
-  if (cat.includes('home')) {
+  if (catLower.includes('home')) {
     return 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=150&q=80';
   }
-  if (cat.includes('book')) {
+  if (catLower.includes('book')) {
     return 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=150&q=80';
   }
   return 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=150&q=80';
@@ -22,7 +38,16 @@ const getCategoryFallbackImage = (category) => {
  * Reusable Product Input Form Fields
  * Used in both Add and Edit modals to prevent code duplication.
  */
-function ProductForm({ formData, onChange, categories }) {
+function ProductForm({ 
+  formData, 
+  onChange, 
+  categories,
+  imageOption = 'select',
+  setImageOption,
+  selectedFile,
+  setSelectedFile,
+  existingImages = []
+}) {
   return (
     <>
       {/* Product Name Field */}
@@ -74,30 +99,77 @@ function ProductForm({ formData, onChange, categories }) {
         </select>
       </div>
 
-      {/* Product Image URL Field */}
+      {/* Image Source Selection Option */}
       <div className="mb-3">
-        <label className="form-label text-secondary fw-semibold">Image URL</label>
-        <input
-          type="url"
-          className="form-control custom-input"
-          name="image"
-          placeholder="e.g. https://images.unsplash.com/photo-1505740420928-5e560c06d30e"
-          value={formData.image || ''}
-          onChange={onChange}
-        />
+        <label className="form-label text-secondary fw-semibold d-block">Image Option</label>
+        <div className="btn-group w-100" role="group">
+          <button
+            type="button"
+            className={`btn btn-sm ${imageOption === 'select' ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
+            onClick={() => setImageOption('select')}
+            style={{ borderRadius: '8px 0 0 8px', borderRight: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            Select Existing Image
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${imageOption === 'upload' ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
+            onClick={() => setImageOption('upload')}
+            style={{ borderRadius: '0 8px 8px 0' }}
+          >
+            Upload New Image
+          </button>
+        </div>
       </div>
 
+      {imageOption === 'select' ? (
+        /* Dropdown to select existing images */
+        <div className="mb-3">
+          <label className="form-label text-secondary fw-semibold">Select Existing Image</label>
+          <select
+            className="form-select custom-input"
+            name="image"
+            value={formData.image || ''}
+            onChange={onChange}
+          >
+            <option value="">-- Choose an Image --</option>
+            {existingImages.map((imgName, idx) => (
+              <option key={idx} value={imgName}>{imgName}</option>
+            ))}
+          </select>
+        </div>
+      ) : (
+        /* File input to upload a new image */
+        <div className="mb-3">
+          <label className="form-label text-secondary fw-semibold">Upload Image File</label>
+          <input
+            type="file"
+            className="form-control custom-input"
+            accept="image/*"
+            onChange={(e) => {
+              if (e.target.files && e.target.files[0]) {
+                setSelectedFile(e.target.files[0]);
+              }
+            }}
+          />
+        </div>
+      )}
+
       {/* Live Image Preview */}
-      {formData.image && (
+      {((imageOption === 'select' && formData.image) || (imageOption === 'upload' && selectedFile)) && (
         <div className="mb-3">
           <label className="form-label text-secondary fw-semibold d-block">Image Preview</label>
-          <div className="d-flex align-items-center justify-content-center border rounded p-1" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--input-bg)', width: '64px', height: '64px', overflow: 'hidden' }}>
+          <div className="d-flex align-items-center justify-content-center border rounded p-1" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--input-bg)', width: '96px', height: '96px', overflow: 'hidden' }}>
             <img
-              src={formData.image}
+              src={
+                imageOption === 'select'
+                  ? `http://localhost:5000/uploads/${formData.image}`
+                  : URL.createObjectURL(selectedFile)
+              }
               alt="Preview"
               style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
               onError={(e) => {
-                e.target.src = getCategoryFallbackImage(formData.category);
+                e.target.src = getUserImageFallback(formData.name, formData.category);
               }}
             />
           </div>

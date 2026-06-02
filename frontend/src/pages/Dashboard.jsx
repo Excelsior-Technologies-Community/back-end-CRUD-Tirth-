@@ -21,7 +21,9 @@ import {
   getProducts, 
   createProduct, 
   updateProduct, 
-  deleteProduct 
+  deleteProduct,
+  getImages,
+  uploadImage
 } from '../services/productApi';
 
 /**
@@ -96,9 +98,25 @@ function Dashboard() {
 
   const categories = ['Electronics', 'Clothing', 'Home', 'Books', 'Other'];
 
+  // Custom image options states
+  const [imageOption, setImageOption] = useState('select'); // 'select' or 'upload'
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [existingImages, setExistingImages] = useState([]);
+
+  // Fetch all available filenames in the uploads folder
+  const fetchExistingImages = async () => {
+    try {
+      const data = await getImages();
+      setExistingImages(data);
+    } catch (error) {
+      console.error('Error fetching images:', error);
+    }
+  };
+
   // Load database items on start
   useEffect(() => {
     fetchProductsList();
+    fetchExistingImages();
   }, []);
 
   // Show temporary overlay alert boxes
@@ -146,19 +164,39 @@ function Dashboard() {
     setLoading(true);
 
     try {
+      let finalImage = formData.image;
+
+      // Handle image upload if user selected upload option and selected a file
+      if (imageOption === 'upload' && selectedFile) {
+        const uploadResult = await uploadImage(selectedFile);
+        if (uploadResult.success) {
+          finalImage = uploadResult.filename;
+        } else {
+          showAlert(uploadResult.message || 'Image upload failed', 'danger');
+          setLoading(false);
+          return;
+        }
+      }
+
+      const payload = {
+        ...formData,
+        image: finalImage
+      };
+
       let data;
       if (editId) {
         // Edit flow
-        data = await updateProduct(editId, formData);
+        data = await updateProduct(editId, payload);
       } else {
         // Create flow
-        data = await createProduct(formData);
+        data = await createProduct(payload);
       }
 
       if (data.success) {
         showAlert(data.message || 'Saved successfully!', 'success');
         closeAllModals();
         fetchProductsList();
+        fetchExistingImages(); // Refresh existing images list
       } else {
         showAlert(data.message || 'Error occurred', 'danger');
       }
@@ -202,8 +240,11 @@ function Dashboard() {
 
   const openAddModal = () => {
     setFormData({ name: '', price: '', category: '', image: '' });
+    setImageOption('select');
+    setSelectedFile(null);
     setEditId(null);
     setIsAddModalOpen(true);
+    fetchExistingImages();
   };
 
   const openEditModal = (product) => {
@@ -213,8 +254,11 @@ function Dashboard() {
       category: product.category,
       image: product.image || ''
     });
+    setImageOption('select');
+    setSelectedFile(null);
     setEditId(product._id);
     setIsEditModalOpen(true);
+    fetchExistingImages();
   };
 
   const openDeleteModal = (product) => {
@@ -383,6 +427,11 @@ function Dashboard() {
         onSubmit={handleSubmit}
         loading={loading}
         categories={categories}
+        imageOption={imageOption}
+        setImageOption={setImageOption}
+        selectedFile={selectedFile}
+        setSelectedFile={setSelectedFile}
+        existingImages={existingImages}
       />
 
       {/* --- EDIT PRODUCT DIALOG --- */}
@@ -394,6 +443,11 @@ function Dashboard() {
         onSubmit={handleSubmit}
         loading={loading}
         categories={categories}
+        imageOption={imageOption}
+        setImageOption={setImageOption}
+        selectedFile={selectedFile}
+        setSelectedFile={setSelectedFile}
+        existingImages={existingImages}
       />
 
       {/* --- DELETE CONFIRMATION MODAL --- */}

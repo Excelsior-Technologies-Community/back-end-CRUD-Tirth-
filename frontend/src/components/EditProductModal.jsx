@@ -6,7 +6,20 @@ import ProductForm from './ProductForm';
  * EditProductModal Component
  * Handles the popup dialog to modify an existing product record.
  */
-function EditProductModal({ isOpen, onClose, formData, onChange, onSubmit, loading, categories }) {
+function EditProductModal({ 
+  isOpen, 
+  onClose, 
+  formData, 
+  onChange, 
+  onSubmit, 
+  loading, 
+  categories,
+  imageOption,
+  setImageOption,
+  selectedFile,
+  setSelectedFile,
+  existingImages
+}) {
   // Listen for Escape key to close the modal
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -43,7 +56,16 @@ function EditProductModal({ isOpen, onClose, formData, onChange, onSubmit, loadi
         
         <form onSubmit={onSubmit}>
           {/* Main Product Fields */}
-          <ProductForm formData={formData} onChange={onChange} categories={categories} />
+          <ProductForm 
+            formData={formData} 
+            onChange={onChange} 
+            categories={categories} 
+            imageOption={imageOption}
+            setImageOption={setImageOption}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            existingImages={existingImages}
+          />
 
           {/* Action Buttons */}
           <div className="d-flex justify-content-end gap-2">

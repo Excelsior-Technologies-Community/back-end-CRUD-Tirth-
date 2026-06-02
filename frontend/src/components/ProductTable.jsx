@@ -18,7 +18,7 @@ function ProductTable({
   openEditModal,
   openDeleteModal
 }) {
-  
+
   // Helper function to return the correct CSS class for category labels
   const getCategoryBadgeClass = (category) => {
     const cat = category.toLowerCase();
@@ -29,19 +29,37 @@ function ProductTable({
     return 'badge-other';
   };
 
-  // Helper function to get default category-based fallback images
-  const getCategoryFallbackImage = (category) => {
-    const cat = (category || '').toLowerCase();
-    if (cat.includes('elect')) {
+  // Helper function to get default category-based or name-based fallback images
+  const getUserImageFallback = (name, category) => {
+    const nameLower = (name || '').toLowerCase();
+    const catLower = (category || '').toLowerCase();
+    
+    if (nameLower.includes('wireless gaming mouse')) {
+      return 'https://pbs.twimg.com/media/GAtXv_Ja8AAi49x.jpg';
+    }
+    if (nameLower.includes('gaming mouse') || nameLower.includes('mouse')) {
+      return 'https://www.3ona51.com/images/products/gaming-mouses/razer-basilisk-v3-35k-black-rz01-05230100-r3m1/600.jpg';
+    }
+    if (nameLower.includes('car')) {
+      return 'https://weeklysamirror.news/wp-content/uploads/2025/05/MOTORINGFerrari-12Cilindr.png';
+    }
+    if (nameLower.includes('bottle')) {
+      return 'https://media.intersport.fr/is/image/intersportfr/JX0015_11I_FA?$produit_m$&$product_grey$';
+    }
+    if (nameLower.includes('laptop') || nameLower.includes('keyboard')) {
+      return 'https://media-assets.hyperinvento.com/companies/c31a99fe-fc32-4275-a453-18c2131fef39/products/97839e51-9a1c-4746-8489-1712c04808b5/featureds/images/3c703838574946dd8073ea67f3f7c474-product-featured-lg.jpg';
+    }
+    
+    if (catLower.includes('elect')) {
       return 'https://images.unsplash.com/photo-1498049794561-7780e7231661?auto=format&fit=crop&w=150&q=80';
     }
-    if (cat.includes('cloth')) {
+    if (catLower.includes('cloth')) {
       return 'https://images.unsplash.com/photo-1523381210434-271e8be1f52b?auto=format&fit=crop&w=150&q=80';
     }
-    if (cat.includes('home')) {
+    if (catLower.includes('home')) {
       return 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&w=150&q=80';
     }
-    if (cat.includes('book')) {
+    if (catLower.includes('book')) {
       return 'https://images.unsplash.com/photo-1495446815901-a7297e633e8d?auto=format&fit=crop&w=150&q=80';
     }
     return 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=150&q=80';
@@ -49,7 +67,7 @@ function ProductTable({
 
   return (
     <section className="card glass-panel text-white p-4 animate-fade-in">
-      
+
       {/* Directory Title, Total Counts, and Search/Filters Controls */}
       <div className="row g-3 align-items-center mb-4">
         <div className="col-md-6">
@@ -61,7 +79,7 @@ function ProductTable({
             </span>
           </h3>
         </div>
-        
+
         {/* Search Bar Input */}
         <div className="col-md-3">
           <div className="input-group">
@@ -138,14 +156,15 @@ function ProductTable({
             </thead>
             <tbody>
               {filteredProducts.map((product, index) => {
-                const fallbackImg = getCategoryFallbackImage(product.category);
+                const fallbackImg = getUserImageFallback(product.name, product.category);
+                const imageUrl = product.image ? `http://localhost:5000/uploads/${product.image}` : fallbackImg;
                 return (
                   <tr key={product._id} className="animate-fade-in">
                     {/* Thumbnail Image Column */}
                     <td>
                       <div className="d-flex align-items-center justify-content-center border rounded bg-dark" style={{ width: '48px', height: '48px', overflow: 'hidden', borderColor: 'var(--panel-border)' }}>
                         <img
-                          src={product.image || fallbackImg}
+                          src={imageUrl}
                           alt={product.name}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                           onError={(e) => {
@@ -161,41 +180,42 @@ function ProductTable({
                         ID: {product._id}
                       </small>
                     </td>
-                  {/* Category Type Column */}
-                  <td>
-                    <span className={`badge badge-category ${getCategoryBadgeClass(product.category)}`}>
-                      {product.category}
-                    </span>
-                  </td>
-                  {/* Value Column */}
-                  <td>
-                    <span className="fw-bold text-gradient-cyan fs-5">
-                      ₹{parseFloat(product.price).toFixed(2)}
-                    </span>
-                  </td>
-                  {/* Action Column Buttons */}
-                  <td className="text-end">
-                    <div className="d-inline-flex gap-2">
-                      <button
-                        type="button"
-                        className="btn-action btn-action-edit"
-                        onClick={() => openEditModal(product)}
-                        title="Edit product"
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      <button
-                        type="button"
-                        className="btn-action btn-action-delete"
-                        onClick={() => openDeleteModal(product)}
-                        title="Delete product"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ); })}
+                    {/* Category Type Column */}
+                    <td>
+                      <span className={`badge badge-category ${getCategoryBadgeClass(product.category)}`}>
+                        {product.category}
+                      </span>
+                    </td>
+                    {/* Value Column */}
+                    <td>
+                      <span className="fw-bold text-gradient-cyan fs-5">
+                        ₹{parseFloat(product.price).toFixed(2)}
+                      </span>
+                    </td>
+                    {/* Action Column Buttons */}
+                    <td className="text-end">
+                      <div className="d-inline-flex gap-2">
+                        <button
+                          type="button"
+                          className="btn-action btn-action-edit"
+                          onClick={() => openEditModal(product)}
+                          title="Edit product"
+                        >
+                          <Edit3 size={16} />
+                        </button>
+                        <button
+                          type="button"
+                          className="btn-action btn-action-delete"
+                          onClick={() => openDeleteModal(product)}
+                          title="Delete product"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

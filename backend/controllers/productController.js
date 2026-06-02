@@ -1,4 +1,6 @@
 const Product = require('../models/Product');
+const fs = require('fs');
+const path = require('path');
 
 /**
  * @desc    Create a new product
@@ -124,6 +126,19 @@ const deleteProduct = async (req, res) => {
                 success: false,
                 message: 'Product not found'
             });
+        }
+
+        // Optionally remove uploaded image file if it was uploaded by user
+        const imageFilename = deletedProduct.image;
+        const defaultImages = ['car.png', 'bottle.jpg', 'laptop.jpg', 'wireless_gaming_mouse.jpg', 'gaming_mouse.jpg'];
+        if (imageFilename && !defaultImages.includes(imageFilename)) {
+            const filePath = path.join(__dirname, '../uploads', imageFilename);
+            if (fs.existsSync(filePath)) {
+                fs.unlink(filePath, (err) => {
+                    if (err) console.error('Error deleting file:', err);
+                    else console.log('Deleted uploaded image file:', imageFilename);
+                });
+            }
         }
 
         console.log('Product Deleted');

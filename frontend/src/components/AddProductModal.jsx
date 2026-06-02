@@ -6,7 +6,20 @@ import ProductForm from './ProductForm';
  * AddProductModal Component
  * Handles the popup dialog to create a new database product.
  */
-function AddProductModal({ isOpen, onClose, formData, onChange, onSubmit, loading, categories }) {
+function AddProductModal({ 
+  isOpen, 
+  onClose, 
+  formData, 
+  onChange, 
+  onSubmit, 
+  loading, 
+  categories,
+  imageOption,
+  setImageOption,
+  selectedFile,
+  setSelectedFile,
+  existingImages
+}) {
   // Listen for Escape key to close the modal
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -43,7 +56,16 @@ function AddProductModal({ isOpen, onClose, formData, onChange, onSubmit, loadin
         
         <form onSubmit={onSubmit}>
           {/* Main Product Fields */}
-          <ProductForm formData={formData} onChange={onChange} categories={categories} />
+          <ProductForm 
+            formData={formData} 
+            onChange={onChange} 
+            categories={categories} 
+            imageOption={imageOption}
+            setImageOption={setImageOption}
+            selectedFile={selectedFile}
+            setSelectedFile={setSelectedFile}
+            existingImages={existingImages}
+          />
 
           {/* Action Action Buttons */}
           <div className="d-flex justify-content-end gap-2">
