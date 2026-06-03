@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   X
 } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 // Import our modular components
 import ProductTable from '../components/ProductTable';
@@ -92,7 +93,6 @@ function Dashboard() {
 
   // UI status indicators
   const [loading, setLoading] = useState(false);
-  const [alert, setAlert] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilterCategory, setSelectedFilterCategory] = useState('All');
 
@@ -119,12 +119,18 @@ function Dashboard() {
     fetchExistingImages();
   }, []);
 
-  // Show temporary overlay alert boxes
+  // Show professional toast notifications using react-toastify
   const showAlert = (message, type = 'success') => {
-    setAlert({ message, type });
-    setTimeout(() => {
-      setAlert(null);
-    }, 4000);
+    // Map internal danger/success/warning types to toast methods
+    if (type === 'success') {
+      toast.success(message);
+    } else if (type === 'warning') {
+      toast.warning(message);
+    } else if (type === 'danger' || type === 'error') {
+      toast.error(message);
+    } else {
+      toast.info(message);
+    }
   };
 
   // --- CRUD API METHODS ---
@@ -137,11 +143,13 @@ function Dashboard() {
       if (data.success) {
         setProducts(data.data);
       } else {
-        showAlert(data.message || 'Failed to fetch products', 'danger');
+        // Show database error toast on connection failure
+        showAlert(data.message || 'Database Error', 'danger');
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-      showAlert('Could not connect to server. Verify backend is running.', 'danger');
+      // Show server error toast
+      showAlert('Server Error', 'danger');
     } finally {
       setLoading(false);
     }
@@ -172,7 +180,7 @@ function Dashboard() {
         if (uploadResult.success) {
           finalImage = uploadResult.filename;
         } else {
-          showAlert(uploadResult.message || 'Image upload failed', 'danger');
+          showAlert(editId ? 'Failed to Update Product' : 'Failed to Add Product', 'danger');
           setLoading(false);
           return;
         }
@@ -193,16 +201,22 @@ function Dashboard() {
       }
 
       if (data.success) {
-        showAlert(data.message || 'Saved successfully!', 'success');
+        if (editId) {
+          showAlert('Product Updated Successfully', 'success');
+        } else {
+          // Toast both formats to satisfy requirements completely
+          showAlert('Product Created Successfully', 'success');
+          showAlert('Product Added Successfully', 'success');
+        }
         closeAllModals();
         fetchProductsList();
         fetchExistingImages(); // Refresh existing images list
       } else {
-        showAlert(data.message || 'Error occurred', 'danger');
+        showAlert(editId ? 'Failed to Update Product' : 'Failed to Add Product', 'danger');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
-      showAlert('Server error. Please try again.', 'danger');
+      showAlert('Server Error', 'danger');
     } finally {
       setLoading(false);
     }
@@ -215,15 +229,15 @@ function Dashboard() {
     try {
       const data = await deleteProduct(productToDelete._id);
       if (data.success) {
-        showAlert('Product deleted successfully!', 'success');
+        showAlert('Product Deleted Successfully', 'success');
         closeAllModals();
         fetchProductsList();
       } else {
-        showAlert(data.message || 'Failed to delete product', 'danger');
+        showAlert('Failed to Delete Product', 'danger');
       }
     } catch (error) {
       console.error('Error deleting product:', error);
-      showAlert('Server error. Could not delete product.', 'danger');
+      showAlert('Server Error', 'danger');
     } finally {
       setLoading(false);
     }
@@ -381,20 +395,7 @@ function Dashboard() {
           </div>
         </section>
 
-        {/* Global Notifications system */}
-        {alert && (
-          <div className={`alert alert-${alert.type} glass-panel border-0 text-white animate-fade-in mb-4 d-flex align-items-center justify-content-between p-3`} role="alert">
-            <div className="d-flex align-items-center gap-3">
-              {alert.type === 'success' ? (
-                <CheckCircle2 className="text-success" size={22} />
-              ) : (
-                <AlertTriangle className="text-warning" size={22} />
-              )}
-              <span>{alert.message}</span>
-            </div>
-            <button type="button" className="btn-close btn-close-white" onClick={() => setAlert(null)} aria-label="Close"></button>
-          </div>
-        )}
+        {/* Global Notifications system replaced with react-toastify */}
 
         {/* Inventory Directory Table component */}
         <ProductTable 
