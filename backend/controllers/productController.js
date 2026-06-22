@@ -20,6 +20,9 @@ const createProduct = async (req, res) => {
             });
         }
 
+        console.log(`[PRODUCT CREATION] Request received for: ${JSON.stringify({ name, price, category })}`);
+        console.log('[PRODUCT CREATION] Attempting to save new Product document in MongoDB Atlas...');
+
         // Create new product in database
         const newProduct = new Product({
             name,
@@ -29,7 +32,7 @@ const createProduct = async (req, res) => {
         });
 
         const savedProduct = await newProduct.save();
-        console.log('Product Added Successfully');
+        console.log(`[PRODUCT SAVE] Product document saved successfully! ID: ${savedProduct._id}, Collection: stocksync.products`);
 
         res.status(201).json({
             success: true,
@@ -37,7 +40,7 @@ const createProduct = async (req, res) => {
             data: savedProduct
         });
     } catch (error) {
-        console.error('API Errors:', error.message);
+        console.error('[PRODUCT CREATION] Database insertion failed during product save:', error);
         res.status(500).json({
             success: false,
             message: 'Server error while adding product',

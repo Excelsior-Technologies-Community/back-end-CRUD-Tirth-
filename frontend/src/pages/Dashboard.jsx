@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Plus, 
   Trash2, 
@@ -8,7 +9,9 @@ import {
   Loader2, 
   CheckCircle2, 
   AlertTriangle,
-  X
+  X,
+  LogOut,
+  User as UserIcon
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -26,6 +29,7 @@ import {
   getImages,
   uploadImage
 } from '../services/productApi';
+import { getDbStatus } from '../services/authApi';
 
 /**
  * Common modal wrapper used for delete confirmation popup.
@@ -48,22 +52,15 @@ function Modal({ isOpen, onClose, title, children }) {
   if (!isOpen) return null;
 
   return (
-    <div className="custom-modal-overlay" onClick={onClose}>
-      <div className="custom-modal-content glass-panel" onClick={(e) => e.stopPropagation()}>
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h4 className="m-0 fw-bold text-white">{title}</h4>
-          <button 
-            type="button" 
-            className="btn border-0 p-1 text-secondary hover-text-white bg-transparent" 
-            onClick={onClose} 
-            aria-label="Close"
-          >
-            <X size={20} />
+    <div className="custom-modal-overlay">
+      <div className="custom-modal-content">
+        <div className="custom-modal-header">
+          <h5 className="custom-modal-title text-white">{title}</h5>
+          <button className="custom-modal-close" onClick={onClose}>
+            <X size={18} />
           </button>
         </div>
-        <div className="custom-modal-body">
-          {children}
-        </div>
+        <div className="custom-modal-body">{children}</div>
       </div>
     </div>
   );
@@ -73,6 +70,47 @@ function Modal({ isOpen, onClose, title, children }) {
  * Dashboard Page component
  */
 function Dashboard() {
+  const navigate = useNavigate();
+  const [loggedInUser, setLoggedInUser] = useState({ name: '', email: '' });
+  const [dbStatus, setDbStatus] = useState('Checking...');
+
+  // Fetch active database connection status from backend
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        const data = await getDbStatus();
+        if (data.success) {
+          setDbStatus(data.dbType);
+        } else {
+          setDbStatus('Unknown');
+        }
+      } catch (err) {
+        setDbStatus('Disconnected');
+      }
+    };
+    fetchStatus();
+  }, []);
+
+  // Load current authenticated user info
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      try {
+        setLoggedInUser(JSON.parse(storedUser));
+      } catch (err) {
+        console.error('Error parsing stored user:', err);
+      }
+    }
+  }, []);
+
+  // Handle logout
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    toast.success('Logged out successfully!');
+    navigate('/login');
+  };
+
   // --- STATE SYSTEM ---
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
@@ -204,15 +242,18 @@ function Dashboard() {
         if (editId) {
           showAlert('Product Updated Successfully', 'success');
         } else {
-          // Toast both formats to satisfy requirements completely
           showAlert('Product Created Successfully', 'success');
-          showAlert('Product Added Successfully', 'success');
         }
         closeAllModals();
         fetchProductsList();
         fetchExistingImages(); // Refresh existing images list
       } else {
-        showAlert(editId ? 'Failed to Update Product' : 'Failed to Add Product', 'danger');
+        showAlert(data.message || (editId ? 'Failed to Update Product' : 'Failed to Add Product'), 'danger');
+        if (data.message && data.message.includes('authorized')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error);
@@ -233,7 +274,12 @@ function Dashboard() {
         closeAllModals();
         fetchProductsList();
       } else {
-        showAlert('Failed to Delete Product', 'danger');
+        showAlert(data.message || 'Failed to Delete Product', 'danger');
+        if (data.message && data.message.includes('authorized')) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          navigate('/login');
+        }
       }
     } catch (error) {
       console.error('Error deleting product:', error);
@@ -268,7 +314,14 @@ function Dashboard() {
       category: product.category,
       image: product.image || ''
     });
-    setImageOption('select');
+    
+    // Automatically detect image option based on whether the image is an external URL
+    if (product.image && (product.image.startsWith('http://') || product.image.startsWith('https://'))) {
+      setImageOption('url');
+    } else {
+      setImageOption('select');
+    }
+    
     setSelectedFile(null);
     setEditId(product._id);
     setIsEditModalOpen(true);
@@ -333,14 +386,42 @@ function Dashboard() {
             <p className="text-secondary m-0" style={{ fontSize: '0.95rem' }}>
               Full-Stack CRUD inventory manager and dashboard analytics.
             </p>
+            {loggedInUser.name && (
+              <div className="mt-2 d-flex flex-wrap align-items-center gap-2" style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                <span>Logged in as: <strong className="text-white">{loggedInUser.name}</strong> ({loggedInUser.email})</span>
+                <span className="badge rounded-pill bg-dark border text-secondary px-2 py-1" style={{ borderColor: 'var(--panel-border)', fontSize: '0.75rem' }}>
+                  DB: <span className="text-white">{dbStatus}</span>
+                </span>
+              </div>
+            )}
           </div>
-          <div>
+          <div className="d-flex flex-wrap align-items-center gap-3">
+            {/* Logged in User Information */}
+            {loggedInUser.name && (
+              <div className="d-flex align-items-center gap-2 px-3 py-2 border rounded glass-panel" style={{ borderColor: 'var(--panel-border)', background: 'rgba(255,255,255,0.02)' }}>
+                <UserIcon size={16} className="text-secondary" />
+                <span className="text-white fw-medium" style={{ fontSize: '0.9rem' }}>
+                  {loggedInUser.name}
+                </span>
+              </div>
+            )}
+            
             <button
               onClick={openAddModal}
               className="btn btn-glow-primary px-4 py-2 d-flex align-items-center gap-2 fw-semibold"
             >
               <Plus size={18} />
               Add Product
+            </button>
+
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="btn btn-outline-danger px-3 py-2 d-flex align-items-center gap-2 fw-semibold"
+              style={{ borderRadius: '8px', border: '1px solid rgba(239, 68, 68, 0.4)' }}
+            >
+              <LogOut size={16} />
+              Logout
             </button>
           </div>
         </header>

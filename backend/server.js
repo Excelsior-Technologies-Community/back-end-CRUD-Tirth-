@@ -19,6 +19,7 @@ const connectDB = require('./config/db');
 
 // Import the product routes
 const productRoutes = require('./routes/productRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 // Load environment variables from the .env file into process.env
 dotenv.config();
@@ -99,6 +100,35 @@ app.get('/api/images', (req, res) => {
 
 // Mounting our Product API routes under /api/products
 app.use('/api/products', productRoutes);
+
+// Mounting our Auth API routes under /api/auth
+app.use('/api/auth', authRoutes);
+
+// GET /api/db-status - Retrieve database connection status
+app.get('/api/db-status', (req, res) => {
+    const mongoose = require('mongoose');
+    const state = mongoose.connection.readyState;
+    let dbType = 'Disconnected';
+    let host = 'None';
+    
+    if (state === 1) { // Connected
+        host = mongoose.connection.host;
+        if (host.includes('mongodb.net')) {
+            dbType = 'MongoDB Atlas (Cloud)';
+        } else if (host.includes('127.0.0.1') || host.includes('localhost') || host.includes('27017')) {
+            dbType = 'Local MongoDB (localhost:27017)';
+        } else {
+            dbType = 'In-Memory (Mock Sandbox)';
+        }
+    }
+    
+    res.json({
+        success: true,
+        dbType,
+        host,
+        dbName: mongoose.connection.db?.databaseName || 'stocksync'
+    });
+});
 
 // Create a basic GET route for the root URL ('/') for testing
 app.get('/', (req, res) => {

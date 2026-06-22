@@ -1,30 +1,41 @@
 // Import the mongoose library to interact with MongoDB
 const mongoose = require('mongoose');
 
-// Define an asynchronous function to connect to the MongoDB database
+/**
+ * Connect to the MongoDB Database.
+ * Connects exclusively to MongoDB Atlas.
+ * No local/in-memory database fallbacks allowed.
+ */
 const connectDB = async () => {
+    const uri = process.env.MONGO_URI;
+
+    if (!uri) {
+        console.error('API Errors: MONGO_URI is missing in backend environment variables.');
+        process.exit(1);
+    }
+
+    // Print active MongoDB URI (without password)
+    let sanitizedUri = uri;
+    const match = uri.match(/(mongodb(?:\+srv)?:\/\/[^:]+:)([^@]+)(@.+)/);
+    if (match) {
+        sanitizedUri = `${match[1]}*****${match[3]}`;
+    }
+    console.log(`Active MongoDB URI: ${sanitizedUri}`);
+
     try {
-        let uri = process.env.MONGO_URI;
-
-        // Check if the connection string contains placeholder values (e.g. <password>)
-        // If it does, we spin up an in-memory MongoDB server so the server connects successfully for local testing
-        if (!uri || uri.includes('<password>') || uri.includes('<db_password>') || uri.includes('your_username')) {
-            console.log('Database placeholder detected in .env. Starting a local in-memory MongoDB server for testing...');
-            const { MongoMemoryServer } = require('mongodb-memory-server');
-            const mongoServer = await MongoMemoryServer.create();
-            uri = mongoServer.getUri();
-        }
-
-        // Attempt to connect to MongoDB using mongoose, specifying database name as stocksync
-        await mongoose.connect(uri, { dbName: 'stocksync' });
-
-        // Log a success message to the console once the connection is established
-        console.log('MongoDB Connected');
+        console.log('Connecting to MongoDB Atlas...');
+        // Attempt to connect to MongoDB Atlas
+        await mongoose.connect(uri, { 
+            dbName: 'stocksync'
+        });
+        
+        console.log('MongoDB Connected (Atlas Cloud)');
+        console.log(`Active Database Name: ${mongoose.connection.db.databaseName}`);
     } catch (error) {
-        // Log any errors that occur during the connection attempt
-        console.error(`API Errors: MongoDB Connection Error: ${error.message}`);
+        console.error(`MongoDB Atlas Connection Failed: ${error.message}`);
+        console.error('Local/In-Memory MongoDB fallback has been disabled. Exiting process...');
+        process.exit(1);
     }
 };
 
-// Export the connectDB function so it can be imported and run in server.js
 module.exports = connectDB;

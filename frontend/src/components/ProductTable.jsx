@@ -157,7 +157,11 @@ function ProductTable({
             <tbody>
               {filteredProducts.map((product, index) => {
                 const fallbackImg = getUserImageFallback(product.name, product.category);
-                const imageUrl = product.image ? `http://localhost:5000/uploads/${product.image}` : fallbackImg;
+                const imageUrl = product.image 
+                  ? (product.image.startsWith('http://') || product.image.startsWith('https://')
+                      ? product.image
+                      : `http://localhost:5000/uploads/${product.image}`)
+                  : fallbackImg;
                 return (
                   <tr key={product._id} className="animate-fade-in">
                     {/* Thumbnail Image Column */}

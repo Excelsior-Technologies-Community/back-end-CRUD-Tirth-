@@ -109,20 +109,28 @@ function ProductForm({
             onClick={() => setImageOption('select')}
             style={{ borderRadius: '8px 0 0 8px', borderRight: '1px solid rgba(255,255,255,0.1)' }}
           >
-            Select Existing Image
+            Select Existing
           </button>
           <button
             type="button"
             className={`btn btn-sm ${imageOption === 'upload' ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
             onClick={() => setImageOption('upload')}
+            style={{ borderRight: '1px solid rgba(255,255,255,0.1)' }}
+          >
+            Upload Image
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${imageOption === 'url' ? 'btn-primary' : 'btn-outline-secondary text-white'}`}
+            onClick={() => setImageOption('url')}
             style={{ borderRadius: '0 8px 8px 0' }}
           >
-            Upload New Image
+            Image URL
           </button>
         </div>
       </div>
 
-      {imageOption === 'select' ? (
+      {imageOption === 'select' && (
         /* Dropdown to select existing images */
         <div className="mb-3">
           <label className="form-label text-secondary fw-semibold">Select Existing Image</label>
@@ -138,7 +146,9 @@ function ProductForm({
             ))}
           </select>
         </div>
-      ) : (
+      )}
+
+      {imageOption === 'upload' && (
         /* File input to upload a new image */
         <div className="mb-3">
           <label className="form-label text-secondary fw-semibold">Upload Image File</label>
@@ -155,16 +165,35 @@ function ProductForm({
         </div>
       )}
 
+      {imageOption === 'url' && (
+        /* Text input to paste image URL */
+        <div className="mb-3">
+          <label className="form-label text-secondary fw-semibold">Image URL</label>
+          <input
+            type="url"
+            className="form-control custom-input"
+            name="image"
+            placeholder="e.g. https://example.com/image.jpg"
+            value={formData.image || ''}
+            onChange={onChange}
+          />
+        </div>
+      )}
+
       {/* Live Image Preview */}
-      {((imageOption === 'select' && formData.image) || (imageOption === 'upload' && selectedFile)) && (
+      {((imageOption === 'select' && formData.image) || 
+        (imageOption === 'url' && formData.image) || 
+        (imageOption === 'upload' && selectedFile)) && (
         <div className="mb-3">
           <label className="form-label text-secondary fw-semibold d-block">Image Preview</label>
           <div className="d-flex align-items-center justify-content-center border rounded p-1" style={{ borderColor: 'var(--panel-border)', backgroundColor: 'var(--input-bg)', width: '96px', height: '96px', overflow: 'hidden' }}>
             <img
               src={
-                imageOption === 'select'
-                  ? `http://localhost:5000/uploads/${formData.image}`
-                  : URL.createObjectURL(selectedFile)
+                imageOption === 'upload'
+                  ? URL.createObjectURL(selectedFile)
+                  : (formData.image && (formData.image.startsWith('http://') || formData.image.startsWith('https://'))
+                      ? formData.image
+                      : `http://localhost:5000/uploads/${formData.image}`)
               }
               alt="Preview"
               style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px' }}
