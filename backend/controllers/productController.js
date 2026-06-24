@@ -14,9 +14,9 @@ const createProduct = async (req, res) => {
         // Simple validation check
         if (!name || price === undefined || !category) {
             console.error('API Errors: Missing required fields (name, price, or category)');
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Please provide name, price, and category' 
+            return res.status(400).json({
+                success: false,
+                message: 'Please provide name, price, and category'
             });
         }
 
@@ -163,9 +163,47 @@ const deleteProduct = async (req, res) => {
     }
 };
 
+/**
+ * @desc    Get a single product by ID (Public)
+ * @route   GET /api/products/:id
+ * @access  Public
+ */
+const getProductById = async (req, res) => {
+    try {
+        const product = await Product.findById(req.params.id);
+
+        if (!product) {
+            console.error('API Errors: Product not found');
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: product
+        });
+    } catch (error) {
+        console.error('API Errors:', error.message);
+        if (error.name === 'CastError') {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found'
+            });
+        }
+        res.status(500).json({
+            success: false,
+            message: 'Server error while fetching product',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     createProduct,
     getProducts,
+    getProductById,
     updateProduct,
     deleteProduct
 };

@@ -17,6 +17,9 @@ const multer = require('multer');
 // Import the database connection helper function we created in config/db.js
 const connectDB = require('./config/db');
 
+// Import Swagger API documentation setup helper
+const setupSwagger = require('./config/swagger');
+
 // Import the product routes
 const productRoutes = require('./routes/productRoutes');
 const authRoutes = require('./routes/authRoutes');
@@ -42,6 +45,9 @@ app.use(express.json());
 
 // Serve uploaded images statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
+// Initialize and mount Swagger documentation UI on /api-docs route
+setupSwagger(app);
 
 // Configure multer storage for image uploads
 const storage = multer.diskStorage({

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
     createProduct,
     getProducts,
+    getProductById,
     updateProduct,
     deleteProduct
 } = require('../controllers/productController');
@@ -17,6 +18,10 @@ router.post('/', protect, createProduct);
 // @route   GET /api/products
 // @desc    Get all products (sorted by newest first) (Public)
 router.get('/', getProducts);
+
+// @route   GET /api/products/:id
+// @desc    Get a single product by ID (Public)
+router.get('/:id', getProductById);
 
 // @route   PUT /api/products/:id
 // @desc    Update an existing product (Protected)
