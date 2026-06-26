@@ -119,7 +119,9 @@ app.get('/api/db-status', (req, res) => {
     
     if (state === 1) { // Connected
         host = mongoose.connection.host;
-        if (host.includes('mongodb.net')) {
+        if (global.isFallbackDB) {
+            dbType = 'In-Memory (Mock Sandbox)';
+        } else if (host.includes('mongodb.net')) {
             dbType = 'MongoDB Atlas (Cloud)';
         } else if (host.includes('127.0.0.1') || host.includes('localhost') || host.includes('27017')) {
             dbType = 'Local MongoDB (localhost:27017)';
