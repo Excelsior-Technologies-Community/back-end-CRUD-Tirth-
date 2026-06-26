@@ -272,7 +272,7 @@ const changePassword = async (req, res) => {
         // 4. Update password and isTempPassword status
         user.password = newPassword;
         user.isTempPassword = false;
-        
+
         console.log(`[USER SAVE] Attempting to save updated password/isTempPassword for user ID: ${user._id}`);
         await user.save();
         console.log(`[USER SAVE] User updated and saved successfully! ID: ${user._id}`);
