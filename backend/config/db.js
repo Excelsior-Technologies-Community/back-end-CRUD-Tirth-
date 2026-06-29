@@ -34,9 +34,26 @@ const connectDB = async () => {
         console.log(`Active Database Name: ${mongoose.connection.db.databaseName}`);
     } catch (error) {
         console.error(`MongoDB Atlas Connection Failed: ${error.message}`);
+        
+        let publicIp = '43.250.159.175';
+        try {
+            const https = require('https');
+            publicIp = await new Promise((resolve) => {
+                const req = https.get('https://api.ipify.org', { timeout: 3000 }, (res) => {
+                    let data = '';
+                    res.on('data', (chunk) => { data += chunk; });
+                    res.on('end', () => { resolve(data.trim() || '43.250.159.175'); });
+                });
+                req.on('error', () => { resolve('43.250.159.175'); });
+                req.on('timeout', () => { req.destroy(); resolve('43.250.159.175'); });
+            });
+        } catch (ipErr) {
+            // Fallback to default
+        }
+
         console.warn('\n================================================================');
         console.warn('WARNING: Your current IP address is not whitelisted in MongoDB Atlas.');
-        console.warn('To upload data to Atlas, please whitelist IP: 117.98.141.63');
+        console.warn(`To upload data to Atlas, please whitelist IP: ${publicIp}`);
         console.warn('Falling back to a local In-Memory database so the application works.');
         console.warn('================================================================\n');
 
